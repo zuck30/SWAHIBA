@@ -86,22 +86,6 @@ Thumbs.db
 EHthumbs.db
 Desktop.ini
 
-# large files
-*.zip
-*.tar.gz
-*.rar
-*.7z
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.mp4
-*.mp3
-*.wav
-*.pkl
-*.h5
-*.keras
-*.onnx
 
 # huggingface
 .cache/
