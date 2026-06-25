@@ -1,1 +1,111 @@
+# dependencies
 node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# mlx model files
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+model_weights/
+checkpoints/
+
+# dataset files
+*.jsonl
+*.txt
+*.csv
+*.parquet
+data/
+Swahili_Corpus/
+datasets/
+
+# tokenizer files
+*.model
+*.vocab
+tokenizer/
+
+# logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+EHthumbs.db
+Desktop.ini
+
+# large files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mp3
+*.wav
+*.pkl
+*.h5
+*.keras
+*.onnx
+
+# huggingface
+.cache/
+~/.cache/huggingface/
+
+# mlx cache
+~/.cache/mlx/
