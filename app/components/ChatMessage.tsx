@@ -66,16 +66,10 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
 
   return (
     <div className={clsx("flex items-start gap-3 mt-6", isUser ? "flex-row-reverse" : "flex-row")}>
-      {/* Avatar */}
-      <div
-        className={clsx(
-          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-medium overflow-hidden",
-          isUser ? "bg-gray-900 text-white" : "bg-gray-100"
-        )}
-      >
-        {isUser ? (
-          "You"
-        ) : (
+      {isUser ? (
+        <div className="w-8 h-8 flex-shrink-0" />
+      ) : (
+        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-100">
           <Image
             src="/assets/rubber-duck.png"
             alt="Swahiba"
@@ -83,15 +77,15 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
             height={20}
             className="object-contain"
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Message content */}
       <div
         className={clsx(
           "max-w-[85%] leading-relaxed",
           isUser
-            ? "px-4 py-3 bg-gray-900 text-white rounded-2xl rounded-tr-none"
+            ? "px-5 py-3 bg-gray-200 text-gray-900 rounded-xl shadow-sm"
             : "py-2"
         )}
       >
