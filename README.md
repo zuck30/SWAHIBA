@@ -95,7 +95,7 @@ Contributions are welcome and easy to follow:
 
 <br>
 <!-- <p align="center">
-    <img src="swahiba_interface.png" alt="Swaiba Interface" width="800">
+    <img src="swahiba_interface.png" alt="Swahiba Interface" width="800">
 </p> -->
 
 ## License
