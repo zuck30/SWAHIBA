@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with actual FastAPI call
+    // TODO: We will Replace with actual FastAPI call
     // For now, return a mock response
     const mockResponses = [
       "Habari! Ninakuelewa vizuri. (Hello! I understand you well.)",
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       "Sawa, naelewa. Hili ndio jibu langu... (Okay, I understand. Here's my answer...)",
     ];
 
-    // Simulate AI response based on message length or content
+    // Will Simulate AI response based on message length or content
     const responseText = mockResponses[Math.floor(Math.random() * mockResponses.length)];
 
     // Simulate processing delay
