@@ -4,7 +4,7 @@
 
 This project presents a complete implementation of a frontend specifically designed for the mixed‑language communication style used across East Africa or Swahili Swahiba LLM from Scratch (Swahili-Gpt).
 
-> **Please, refer to this repository**  
+> **Please, refer to this repository, Where Model Development is taking place**  
 >https://github.com/zuck30/swahili-llm-scratch
 
 ## Features
