@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { useState, useRef, useEffect } from "react";
 import { useChatStore } from "../store/chatStore";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
@@ -32,27 +33,27 @@ export default function ChatInput() {
   }, [input]);
 
   return (
-    <div className="flex items-end gap-3">
-      <div className="flex-1 relative">
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
-          placeholder="Andika ujumbe wako..."
-          rows={1}
-          className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-tz-kitenge-tan/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-tz-accent/40 focus:border-transparent resize-none transition-all text-tz-dark placeholder:text-tz-earth/40 max-h-32"
-          disabled={isGenerating}
-        />
-      </div>
+    <div className="swahiba-input flex items-end gap-2 px-4 py-2.5">
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={() => setIsComposing(true)}
+        onCompositionEnd={() => setIsComposing(false)}
+        placeholder="Message Swahiba..."
+        rows={1}
+        className="flex-1 bg-transparent outline-none resize-none text-gray-900 placeholder:text-gray-400 text-base min-h-[42px] max-h-32"
+        disabled={isGenerating}
+      />
       <button
         onClick={handleSubmit}
         disabled={!input.trim() || isGenerating}
         className={clsx(
-          "kitenge-button p-3 rounded-full flex-shrink-0 transition-all",
-          (!input.trim() || isGenerating) && "opacity-50 cursor-not-allowed hover:scale-100"
+          "p-2 rounded-full transition-all flex-shrink-0",
+          input.trim() && !isGenerating
+            ? "bg-gray-900 text-white hover:bg-black hover:scale-105 active:scale-95"
+            : "bg-gray-100 text-gray-400 cursor-not-allowed"
         )}
       >
         <PaperAirplaneIcon className="w-5 h-5" />

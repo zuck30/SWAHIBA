@@ -2,105 +2,244 @@
 
 import { useState } from "react";
 import { useChatStore } from "../store/chatStore";
-import { PlusIcon, TrashIcon, UserIcon } from "@heroicons/react/24/outline";
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
+  ArrowLeftStartOnRectangleIcon,
+  ArrowRightEndOnRectangleIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import Image from "next/image";
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation } = useChatStore();
 
+  // Check if there's already an empty conversation
+  const hasEmptyConversation = conversations.some(
+    (conv) => conv.messages.length === 0
+  );
+
+  const handleNewChat = () => {
+    if (!hasEmptyConversation) {
+      createNewConversation();
+    }
+  };
+
+  // Filter conversations based on search
+  const filteredConversations = conversations.filter((conv) =>
+    conv.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conv.messages.some((msg) =>
+      msg.content.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   return (
-    <div
-      className={clsx(
-        "bg-tz-earth/95 backdrop-blur-sm text-tz-cream transition-all duration-300 flex flex-col border-r border-tz-kitenge-tan/20",
-        isCollapsed ? "w-16" : "w-72"
-      )}
-    >
-      {/* Header */}
-      <div className="p-4 border-b border-tz-kitenge-tan/20">
-        <div className="flex items-center justify-between">
-          <div className={clsx("flex items-center gap-3", isCollapsed && "justify-center w-full")}>
-            <span className="text-2xl font-bold text-tz-accent">S</span>
-            {!isCollapsed && <span className="font-bold text-lg">Swahiba</span>}
+    <>
+      {/* Mobile Toggle Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+        title={isOpen ? "Close sidebar" : "Open sidebar"}
+      >
+        {isOpen ? (
+          <ArrowLeftStartOnRectangleIcon className="w-5 h-5 text-gray-700" />
+        ) : (
+          <ArrowRightEndOnRectangleIcon className="w-5 h-5 text-gray-700" />
+        )}
+      </button>
+
+      {/* Sidebar Container */}
+      <div
+        className={clsx(
+          "fixed lg:relative flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-40",
+          isOpen ? "w-72 translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-16"
+        )}
+        style={{
+          top: 0,
+          bottom: 0,
+          height: '100dvh',
+          maxHeight: '100dvh',
+        }}
+      >
+        {/* Header: Logo + Toggle */}
+        <div className="p-4 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className={clsx("flex items-center gap-3", !isOpen && "lg:justify-center lg:w-full")}>
+              <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-gray-50 flex-shrink-0">
+                <Image
+                  src="/assets/rubber-duck.png"
+                  alt="Swahiba"
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
+              </div>
+              {isOpen && <span className="font-semibold text-gray-900 text-lg">Swahiba</span>}
+            </div>
+
+            {/* Desktop Toggle */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="hidden lg:block text-gray-500 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+              title={isOpen ? "Close sidebar" : "Open sidebar"}
+            >
+              {isOpen ? (
+                <ArrowLeftStartOnRectangleIcon className="w-7 h-7" />
+              ) : (
+                <ArrowRightEndOnRectangleIcon className="w-7 h-7" />
+              )}
+            </button>
           </div>
+        </div>
+
+        {/* Top Actions: Search + New Chat */}
+        <div className="p-3 space-y-2 flex-shrink-0">
+          {/* Search  Input when open, Icon when closed */}
+          {isOpen ? (
+            <div className="relative">
+              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search conversations..."
+                className="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all"
+                autoFocus={isSearchOpen}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                setIsSearchOpen(true);
+                setTimeout(() => {
+                  const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+                  if (searchInput) searchInput.focus();
+                }, 300);
+              }}
+              className="w-full flex items-center justify-center px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+              title="Search conversations"
+            >
+              <MagnifyingGlassIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            </button>
+          )}
+
+          {/* New Chat Button */}
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-tz-cream/60 hover:text-tz-cream transition-colors"
+            onClick={handleNewChat}
+            className={clsx(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-md bg-gray-900 text-white hover:bg-black transition-colors",
+              !isOpen && "lg:justify-center",
+              hasEmptyConversation && "opacity-50 cursor-not-allowed hover:bg-gray-900"
+            )}
+            title={!isOpen ? "New chat" : hasEmptyConversation ? "Empty chat already exists" : "New chat"}
+            disabled={hasEmptyConversation}
           >
-            {isCollapsed ? "→" : "←"}
+            <PencilSquareIcon className="w-5 h-5 flex-shrink-0" />
+            {isOpen && <span className="text-sm font-medium">New chat</span>}
+          </button>
+        </div>
+
+        {/* Conversations List — Scrollable */}
+        <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5 min-h-0">
+          {filteredConversations.length === 0 && searchQuery ? (
+            <div className="text-center text-sm text-gray-400 py-8">
+              No conversations found
+            </div>
+          ) : (
+            filteredConversations.map((conv) => (
+              <div
+                key={conv.id}
+                className={clsx(
+                  "group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all",
+                  currentConversationId === conv.id
+                    ? "bg-gray-100 text-gray-900 font-medium"
+                    : "hover:bg-gray-50 text-gray-700"
+                )}
+                onClick={() => switchConversation(conv.id)}
+                title={!isOpen ? conv.title || "New Chat" : ""}
+              >
+                {/* Only show icon when sidebar is closed */}
+                {!isOpen && (
+                  <div className="w-5 h-5 flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-xs text-gray-600">💬</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show full content when sidebar is open */}
+                {isOpen && (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm truncate">
+                        {conv.title || "New Chat"}
+                      </p>
+                      {conv.messages.length > 0 && (
+                        <p className="text-xs text-gray-400 truncate mt-0.5">
+                          {conv.messages[conv.messages.length - 1].content.substring(0, 40)}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteConversation(conv.id);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50 transition-all flex-shrink-0"
+                      title="Delete chat"
+                    >
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Footer at bottom */}
+        <div className="p-3 border-t border-gray-100 space-y-2 flex-shrink-0">
+          {/* Settings */}
+          <button
+            className={clsx(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700",
+              !isOpen && "lg:justify-center"
+            )}
+            title={!isOpen ? "Settings" : "Settings"}
+          >
+            <Cog6ToothIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            {isOpen && <span className="text-sm">Settings</span>}
+          </button>
+
+          {/* Logout */}
+          <button
+            className={clsx(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors text-gray-700",
+              !isOpen && "lg:justify-center"
+            )}
+            title={!isOpen ? "Log out" : "Log out"}
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            {isOpen && <span className="text-sm">Log out</span>}
           </button>
         </div>
       </div>
-
-      {/* New Chat Button */}
-      <div className="p-4">
-        <button
-          onClick={createNewConversation}
-          className="w-full kitenge-button flex items-center justify-center gap-2 text-sm"
-        >
-          <PlusIcon className="w-4 h-4" />
-          {!isCollapsed && "New Chat"}
-        </button>
-      </div>
-
-      {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
-        {conversations.map((conv) => (
-          <div
-            key={conv.id}
-            className={clsx(
-              "group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200",
-              currentConversationId === conv.id
-                ? "bg-tz-accent/20 border border-tz-accent/30"
-                : "hover:bg-tz-cream/10"
-            )}
-            onClick={() => switchConversation(conv.id)}
-          >
-            <div className="flex-1 min-w-0">
-              <p className={clsx(
-                "text-sm truncate",
-                currentConversationId === conv.id ? "text-tz-accent" : "text-tz-cream/80"
-              )}>
-                {conv.title || "New Chat"}
-              </p>
-              {!isCollapsed && conv.messages.length > 0 && (
-                <p className="text-xs text-tz-cream/40 truncate">
-                  {conv.messages[conv.messages.length - 1].content.substring(0, 40)}
-                </p>
-              )}
-            </div>
-            {!isCollapsed && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteConversation(conv.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 text-tz-cream/40 hover:text-red-400 transition-all"
-              >
-                <TrashIcon className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-tz-kitenge-tan/20">
-        <div className={clsx("flex items-center gap-3", isCollapsed && "justify-center")}>
-          <div className="w-8 h-8 rounded-full bg-tz-accent/20 flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-tz-accent" />
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Guest</p>
-              <p className="text-xs text-tz-cream/40">Free Plan</p>
-
-            {/*Guest and Free Plan are now displayed hardcoded, We will update this later when we allow user authentication*/}
-
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
