@@ -4,6 +4,7 @@ import { Conversation, Message } from "../types";
 interface ChatState {
   conversations: Conversation[];
   currentConversationId: string | null;
+  currentConversation: Conversation | null;
   isGenerating: boolean;
   
   initializeChat: () => void;
@@ -16,6 +17,7 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   currentConversationId: null,
+  currentConversation: null,
   isGenerating: false,
 
   initializeChat: () => {
@@ -31,6 +33,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       set({
         conversations: [newConversation],
         currentConversationId: newConversation.id,
+        currentConversation: newConversation,
       });
     }
   },
@@ -46,29 +49,35 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((state) => ({
       conversations: [newConversation, ...state.conversations],
       currentConversationId: newConversation.id,
+      currentConversation: newConversation,
     }));
   },
 
   deleteConversation: (id: string) => {
     set((state) => {
       const filtered = state.conversations.filter((conv) => conv.id !== id);
-      const newCurrent = filtered.length > 0 ? filtered[0].id : null;
+      const newCurrentId = filtered.length > 0 ? filtered[0].id : null;
+      const newCurrent = newCurrentId ? filtered.find(c => c.id === newCurrentId) : null;
       return {
         conversations: filtered,
-        currentConversationId: newCurrent,
+        currentConversationId: newCurrentId,
+        currentConversation: newCurrent,
       };
     });
   },
 
   switchConversation: (id: string) => {
-    set({ currentConversationId: id });
+    const conversation = get().conversations.find(c => c.id === id) || null;
+    set({ 
+      currentConversationId: id,
+      currentConversation: conversation
+    });
   },
 
   sendMessage: async (content: string) => {
     const { currentConversationId, conversations } = get();
     if (!currentConversationId) return;
 
-    // Add user message
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -76,9 +85,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       timestamp: Date.now(),
     };
 
-    // Update conversation with user message
-    set((state) => ({
-      conversations: state.conversations.map((conv) =>
+    set((state) => {
+      const updatedConversations = state.conversations.map((conv) =>
         conv.id === currentConversationId
           ? {
               ...conv,
@@ -87,12 +95,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
               updatedAt: Date.now(),
             }
           : conv
-      ),
-      isGenerating: true,
-    }));
+      );
+
+      const updatedCurrent = updatedConversations.find(c => c.id === currentConversationId) || null;
+
+      return {
+        conversations: updatedConversations,
+        currentConversation: updatedCurrent,
+        isGenerating: true,
+      };
+    });
 
     try {
-      // Call API
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,7 +119,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
       const data = await response.json();
 
-      // Add AI response
       const aiMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
@@ -113,8 +126,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
         timestamp: Date.now(),
       };
 
-      set((state) => ({
-        conversations: state.conversations.map((conv) =>
+      set((state) => {
+        const updatedConversations = state.conversations.map((conv) =>
           conv.id === currentConversationId
             ? {
                 ...conv,
@@ -122,20 +135,26 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 updatedAt: Date.now(),
               }
             : conv
-        ),
-        isGenerating: false,
-      }));
+        );
+
+        const updatedCurrent = updatedConversations.find(c => c.id === currentConversationId) || null;
+
+        return {
+          conversations: updatedConversations,
+          currentConversation: updatedCurrent,
+          isGenerating: false,
+        };
+      });
     } catch (error) {
       console.error("Error sending message:", error);
-      // Add error message
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
         content: "Samahani, kuna hitilafu. Tafadhali jaribu tena. (Sorry, there was an error. Please try again.)",
         timestamp: Date.now(),
       };
-      set((state) => ({
-        conversations: state.conversations.map((conv) =>
+      set((state) => {
+        const updatedConversations = state.conversations.map((conv) =>
           conv.id === currentConversationId
             ? {
                 ...conv,
@@ -143,9 +162,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 updatedAt: Date.now(),
               }
             : conv
-        ),
-        isGenerating: false,
-      }));
+        );
+
+        const updatedCurrent = updatedConversations.find(c => c.id === currentConversationId) || null;
+
+        return {
+          conversations: updatedConversations,
+          currentConversation: updatedCurrent,
+          isGenerating: false,
+        };
+      });
     }
   },
 }));
