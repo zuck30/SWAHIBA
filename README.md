@@ -2,7 +2,10 @@
 
 <p align="center">
 
-This project presents a complete implementation of a chat-based AI assistant specifically designed for the mixed‑language communication style used across East Africa.
+This project presents a complete implementation of a frontend specifically designed for the mixed‑language communication style used across East Africa or Swahili Swahiba LLM from Scratch (Swahili-Gpt).
+
+> **Please, refer to this repository**  
+>https://github.com/zuck30/swahili-llm-scratch
 
 ## Features
 
