@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChatStore } from "../store/chatStore";
 import {
   PencilSquareIcon,
@@ -16,12 +16,85 @@ import clsx from "clsx";
 import Image from "next/image";
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null); 
+  const [isInitialized, setIsInitialized] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  
   const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation } = useChatStore();
 
-  // Check if there's already an empty conversation
+  // Check if we're on mobile - runs once on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      
+      // Set initial state based on device
+      if (!isInitialized) {
+        setIsOpen(!mobile); // Open on desktop, closed on mobile
+        setIsInitialized(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [isInitialized]);
+
+  // Handle click outside for mobile
+  useEffect(() => {
+    if (isMobile === null) return; // Don't run until we know device
+    
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        isMobile &&
+        isOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        const target = event.target as HTMLElement;
+        if (target.closest('button[aria-label*="sidebar"]')) return;
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isMobile, isOpen]);
+
+  // Handle resize - auto-open on desktop, auto-close on mobile
+  useEffect(() => {
+    if (isMobile === null) return;
+    
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      if (mobile !== isMobile) {
+        // Device type changed
+        if (mobile) {
+          setIsOpen(false); // Close on mobile
+        } else {
+          setIsOpen(true); // Open on desktop
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
+
+  // Don't render anything until we know if it's mobile or not
+  if (isMobile === null) {
+    return null; // Or a loading skeleton
+  }
+
   const hasEmptyConversation = conversations.some(
     (conv) => conv.messages.length === 0
   );
@@ -29,7 +102,13 @@ export default function Sidebar() {
   const handleNewChat = () => {
     if (!hasEmptyConversation) {
       createNewConversation();
+      if (isMobile) setIsOpen(false);
     }
+  };
+
+  const handleSwitchConversation = (id: string) => {
+    switchConversation(id);
+    if (isMobile) setIsOpen(false);
   };
 
   // Filter conversations based on search
@@ -42,23 +121,30 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
-        title={isOpen ? "Close sidebar" : "Open sidebar"}
-      >
-        {isOpen ? (
-          <ArrowLeftStartOnRectangleIcon className="w-5 h-5 text-gray-700" />
-        ) : (
+      {/* Mobile Toggle Button only show on mobile when sidebar is closed */}
+      {isMobile && !isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+          aria-label="Open sidebar"
+        >
           <ArrowRightEndOnRectangleIcon className="w-5 h-5 text-gray-700" />
-        )}
-      </button>
+        </button>
+      )}
+
+      {/* Mobile backdrop overlay */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Sidebar Container */}
       <div
+        ref={sidebarRef}
         className={clsx(
-          "fixed lg:relative flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-40",
+          "fixed lg:relative flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-50",
           isOpen ? "w-72 translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-16"
         )}
         style={{
@@ -84,11 +170,11 @@ export default function Sidebar() {
               {isOpen && <span className="font-semibold text-gray-900 text-lg">Swahiba</span>}
             </div>
 
-            {/* Desktop Toggle */}
+            {/* Desktop & Mobile Toggle */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="hidden lg:block text-gray-500 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
-              title={isOpen ? "Close sidebar" : "Open sidebar"}
+              className="text-gray-500 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+              aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
             >
               {isOpen ? (
                 <ArrowLeftStartOnRectangleIcon className="w-7 h-7" />
@@ -101,7 +187,7 @@ export default function Sidebar() {
 
         {/* Top Actions: Search + New Chat */}
         <div className="p-3 space-y-2 flex-shrink-0">
-          {/* Search  Input when open, Icon when closed */}
+          {/* Search Input when open, Icon when closed */}
           {isOpen ? (
             <div className="relative">
               <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -171,7 +257,7 @@ export default function Sidebar() {
                     ? "bg-gray-100 text-gray-900 font-medium"
                     : "hover:bg-gray-50 text-gray-700"
                 )}
-                onClick={() => switchConversation(conv.id)}
+                onClick={() => handleSwitchConversation(conv.id)}
                 title={!isOpen ? conv.title || "New Chat" : ""}
               >
                 {/* Only show icon when sidebar is closed */}
