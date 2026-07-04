@@ -40,8 +40,12 @@ npm install @heroicons/react
 Create a `.env.local` file in the project root:
 
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
+
+See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for database schema and Edge Function setup.
 
 # 4. Run Development Server
 
@@ -53,10 +57,16 @@ npm run dev
 
 # Backend Integration
 
-The frontend is designed to work with fastAPI. The chat API endpoint expects:
+The chat is served by a Supabase Edge Function that proxies to the DeepSeek API and logs consented conversations.
 
-- **POST** `/api/chat` - Send messages and receive AI responses
-- **GET** `/api/health` - Health check endpoint
+- **POST** `/api/chat` - Main chat endpoint
+
+# Data Pipeline
+
+Consented conversations are logged to Supabase. You can process them using the provided scripts:
+
+1. **Clean Logs**: `npx ts-node scripts/clean_logs.ts` (Strips PII and saves to `data/cleaned_logs.json`)
+2. **Export Multi-turn**: `npx ts-node scripts/export_instruct.ts` (Converts to multi-turn JSONL format for model training)
 
 # How to Contribute
 

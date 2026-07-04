@@ -11,6 +11,7 @@ import {
   ArrowRightEndOnRectangleIcon,
   MagnifyingGlassIcon,
   XMarkIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Image from "next/image";
@@ -23,7 +24,11 @@ export default function Sidebar() {
   const [isInitialized, setIsInitialized] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   
-  const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation } = useChatStore();
+  const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation, consented, setConsent } = useChatStore();
+
+  const handleToggleConsent = () => {
+    setConsent(!consented);
+  };
 
   // Check if we're on mobile - runs once on mount
   useEffect(() => {
@@ -301,6 +306,24 @@ export default function Sidebar() {
 
         {/* Footer at bottom */}
         <div className="p-3 border-t border-gray-100 space-y-2 flex-shrink-0">
+          {/* Consent Toggle */}
+          <button
+            onClick={handleToggleConsent}
+            className={clsx(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700",
+              !isOpen && "lg:justify-center"
+            )}
+            title={consented ? "Logging enabled" : "Logging disabled"}
+          >
+            <ShieldCheckIcon className={clsx("w-5 h-5 flex-shrink-0", consented ? "text-green-600" : "text-gray-400")} />
+            {isOpen && (
+              <div className="flex flex-col items-start">
+                <span className="text-sm">Logging {consented ? "On" : "Off"}</span>
+                <span className="text-[10px] text-gray-400">Improve Swahiba</span>
+              </div>
+            )}
+          </button>
+
           {/* Settings */}
           <button
             className={clsx(

@@ -15,6 +15,9 @@ export interface Conversation {
 
 export interface ChatRequest {
   messages: Message[];
+  consent: boolean;
+  sessionId: string;
+  conversationId: string;
 }
 
 export interface ChatResponse {

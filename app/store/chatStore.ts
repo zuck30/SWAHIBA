@@ -1,13 +1,16 @@
 import { create } from "zustand";
 import { Conversation, Message } from "../types";
+import { getConsent, getSessionId, setConsent as setConsentInStorage } from "../lib/consent";
 
 interface ChatState {
   conversations: Conversation[];
   currentConversationId: string | null;
   currentConversation: Conversation | null;
   isGenerating: boolean;
+  consented: boolean | null;
   
   initializeChat: () => void;
+  setConsent: (consented: boolean) => void;
   createNewConversation: () => void;
   deleteConversation: (id: string) => void;
   switchConversation: (id: string) => void;
@@ -19,8 +22,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentConversationId: null,
   currentConversation: null,
   isGenerating: false,
+  consented: null,
 
   initializeChat: () => {
+    set({ consented: getConsent() });
     const { conversations } = get();
     if (conversations.length === 0) {
       const newConversation: Conversation = {
@@ -74,6 +79,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
   },
 
+  setConsent: (consented: boolean) => {
+    setConsentInStorage(consented);
+    set({ consented });
+  },
+
   sendMessage: async (content: string) => {
     const { currentConversationId, conversations } = get();
     if (!currentConversationId) return;
@@ -112,6 +122,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: get().conversations.find((c) => c.id === currentConversationId)?.messages || [],
+          consent: get().consented || false,
+          sessionId: getSessionId(),
+          conversationId: currentConversationId,
         }),
       });
 
