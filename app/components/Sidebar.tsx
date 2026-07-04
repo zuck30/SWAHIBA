@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useChatStore } from "../store/chatStore";
 import {
   PencilSquareIcon,
@@ -325,7 +326,8 @@ export default function Sidebar() {
           </button>
 
           {/* Settings */}
-          <button
+          <Link
+            href="/settings"
             className={clsx(
               "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700",
               !isOpen && "lg:justify-center"
@@ -334,7 +336,7 @@ export default function Sidebar() {
           >
             <Cog6ToothIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
             {isOpen && <span className="text-sm">Settings</span>}
-          </button>
+          </Link>
 
           {/* Logout */}
           <button
