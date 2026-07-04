@@ -127,7 +127,7 @@ export default function SettingsPage() {
       title: "Security",
       icon: <BugAntIcon className="w-6 h-6" />,
       content: (
-        <Link href="mailto:security@swahiba.ai" className="flex items-center justify-between p-4 border border-red-100 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
+        <Link href="mailto:sheldoncodesdaily@gmail.com" className="flex items-center justify-between p-4 border border-red-100 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
           <div>
             <p className="font-medium text-red-900">Report Vulnerability</p>
             <p className="text-sm text-red-600">Help us keep Swahiba secure</p>
