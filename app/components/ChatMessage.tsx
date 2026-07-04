@@ -68,24 +68,33 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
         </div>
       )}
 
-      {/* Plain text only — NO BUBBLES */}
-      <div className={clsx("max-w-[90%] leading-relaxed relative group", isUser ? "text-right" : "", !isUser ? "pr-8" : "")}>
-        <div className="text-[15px] text-gray-900 break-words">
+      {/* Message area */}
+      <div className={clsx("max-w-[90%] leading-relaxed relative group", !isUser ? "pr-8" : "")}>
+        <div
+          className={clsx(
+            "text-[15px] break-words",
+            "text-gray-900", // Always dark readable text
+            // Only user gets grey background bubble
+            isUser
+              ? "px-4 py-2.5 bg-gray-200 rounded-xl"
+              : "" // AI: no background, no padding, no bubble
+          )}
+        >
           {isUser ? (
             <div className="whitespace-pre-wrap">{processedContent}</div>
           ) : (
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                p: ({ children }) => <p className="mb-2 last:mb-0 text-gray-900">{children}</p>,
-                strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                em: ({ children }) => <em className="text-gray-900">{children}</em>,
-                ul: ({ children }) => <ul className="list-disc pl-5 my-2 text-gray-900">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-5 my-2 text-gray-900">{children}</ol>,
-                li: ({ children }) => <li className="mb-1 text-gray-900">{children}</li>,
-                h1: ({ children }) => <h1 className="text-xl font-bold my-3 text-gray-900">{children}</h1>,
-                h2: ({ children }) => <h2 className="text-lg font-bold my-2 text-gray-900">{children}</h2>,
-                h3: ({ children }) => <h3 className="text-base font-bold my-2 text-gray-900">{children}</h3>,
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                em: ({ children }) => <em>{children}</em>,
+                ul: ({ children }) => <ul className="list-disc pl-5 my-2">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-5 my-2">{children}</ol>,
+                li: ({ children }) => <li className="mb-1">{children}</li>,
+                h1: ({ children }) => <h1 className="text-xl font-bold my-3">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-lg font-bold my-2">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-base font-bold my-2">{children}</h3>,
                 code({ node, inline, className, children, ...props }: any) {
                   const match = /language-(\w+)/.exec(className || "");
                   return !inline && match ? (
@@ -112,10 +121,10 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
                   );
                 },
                 th({ children }) {
-                  return <th className="bg-gray-100 text-gray-900 px-3 py-2 border border-gray-200 font-semibold text-left">{children}</th>;
+                  return <th className="bg-gray-100 px-3 py-2 border border-gray-200 font-semibold text-left">{children}</th>;
                 },
                 td({ children }) {
-                  return <td className="px-3 py-2 border border-gray-200 text-gray-900">{children}</td>;
+                  return <td className="px-3 py-2 border border-gray-200">{children}</td>;
                 }
               }}
             >
