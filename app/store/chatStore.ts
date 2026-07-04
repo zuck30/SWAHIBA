@@ -22,10 +22,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentConversationId: null,
   currentConversation: null,
   isGenerating: false,
-  consented: null,
+  consented: typeof window !== "undefined" ? getConsent() : null,
 
   initializeChat: () => {
-    set({ consented: getConsent() });
+    const persistedConsent = getConsent();
+    set({ consented: persistedConsent });
     const { conversations } = get();
     if (conversations.length === 0) {
       const newConversation: Conversation = {

@@ -11,17 +11,45 @@ import {
   ScaleIcon,
   UserGroupIcon,
   BugAntIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  ChevronDownIcon
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 
 export default function SettingsPage() {
   const { consented, setConsent } = useChatStore();
   const [sessionId, setSessionId] = useState("");
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   useEffect(() => {
     setSessionId(getSessionId());
   }, []);
+
+  const toggleExpand = (section: string) => {
+    setExpandedSection(expandedSection === section ? null : section);
+  };
+
+  const regulations = [
+    {
+      id: "tos",
+      title: "Terms of Service",
+      icon: <DocumentTextIcon className="w-5 h-5" />,
+      content: "Welcome to Swahiba. By using our service, you agree to provide honest feedback and use the assistant for lawful purposes. We provide Swahiba 'as is' for research and educational use. We are not liable for any generated content that may be inaccurate or inappropriate."
+    },
+    {
+      id: "privacy",
+      title: "Privacy Policy",
+      icon: <ShieldCheckIcon className="w-5 h-5" />,
+      content: "Your privacy is important to us. If you opt-in to logging, we collect your conversation history and an anonymous session ID. We strip personally identifiable information like phone numbers and emails before analysis. We do not sell your data to third parties."
+    },
+    {
+      id: "guidelines",
+      title: "Community Guidelines",
+      icon: <UserGroupIcon className="w-5 h-5" />,
+      content: "Be respectful to the assistant. Do not use Swahiba to generate hate speech, harassment, or illegal content. Swahiba is designed for the Tanzanian community to bridge linguistic gaps in AI."
+    }
+  ];
 
   const sections = [
     {
@@ -65,19 +93,33 @@ export default function SettingsPage() {
       title: "Regulations",
       icon: <ScaleIcon className="w-6 h-6" />,
       content: (
-        <div className="space-y-3">
-          <Link href="#" className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-            <DocumentTextIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-900" />
-            <span className="text-gray-700">Terms of Service</span>
-          </Link>
-          <Link href="#" className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-            <ShieldCheckIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-900" />
-            <span className="text-gray-700">Privacy Policy</span>
-          </Link>
-          <Link href="#" className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-            <UserGroupIcon className="w-5 h-5 text-gray-400 group-hover:text-gray-900" />
-            <span className="text-gray-700">Community Guidelines</span>
-          </Link>
+        <div className="space-y-2">
+          {regulations.map((reg) => (
+            <div key={reg.id} className="border border-gray-100 rounded-lg overflow-hidden">
+              <button
+                onClick={() => toggleExpand(reg.id)}
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-gray-400">
+                    {reg.icon}
+                  </div>
+                  <span className="text-gray-700 font-medium">{reg.title}</span>
+                </div>
+                <ChevronDownIcon
+                  className={clsx(
+                    "w-5 h-5 text-gray-400 transition-transform duration-200",
+                    expandedSection === reg.id && "rotate-180"
+                  )}
+                />
+              </button>
+              {expandedSection === reg.id && (
+                <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed bg-white">
+                  {reg.content}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )
     },
