@@ -156,17 +156,20 @@ export const useChatStore = create<ChatState>()(
 
           const decoder = new TextDecoder();
           let accumulatedContent = "";
+          let buffer = "";
 
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n");
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || ""; // Keep the last incomplete line in the buffer
 
             for (const line of lines) {
+              if (line.trim() === "") continue;
               if (line.startsWith("data: ")) {
-                const dataStr = line.slice(6);
+                const dataStr = line.slice(6).trim();
                 if (dataStr === "[DONE]") continue;
                 try {
                   const data = JSON.parse(dataStr);
@@ -192,7 +195,7 @@ export const useChatStore = create<ChatState>()(
                     };
                   });
                 } catch (e) {
-                  // Ignore parse errors for partial chunks
+                  console.error("Error parsing JSON from stream:", e, dataStr);
                 }
               }
             }

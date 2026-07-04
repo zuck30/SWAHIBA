@@ -73,10 +73,13 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
       <div className={clsx("max-w-[90%] leading-relaxed relative group", isUser ? "" : "pr-8")}>
         <div
           className={clsx(
-            "text-[15px] prose dark:prose-invert max-w-none",
+            "text-[15px] prose prose-slate max-w-none dark:prose-invert",
+            // Forcing pure black text for better readability
+            "prose-p:text-black prose-headings:text-black prose-strong:text-black prose-code:text-black prose-li:text-black",
+            "dark:prose-p:text-white dark:prose-headings:text-white dark:prose-strong:text-white dark:prose-code:text-white dark:prose-li:text-white",
             isUser
-              ? "px-5 py-3 bg-gray-200 text-gray-900 rounded-xl shadow-sm"
-              : "py-2"
+              ? "px-5 py-3 bg-gray-200 text-black rounded-xl shadow-sm"
+              : "py-2 text-black"
           )}
         >
           {isUser ? (
@@ -97,7 +100,7 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
                       {String(children).replace(/\n$/, "")}
                     </SyntaxHighlighter>
                   ) : (
-                    <code className={className} {...props}>
+                    <code className={clsx(className, "text-black dark:text-white bg-gray-100 dark:bg-gray-800 px-1 rounded")} {...props}>
                       {children}
                     </code>
                   );
@@ -112,10 +115,10 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
                   );
                 },
                 th({ children }) {
-                  return <th className="border border-gray-300 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-bold">{children}</th>;
+                  return <th className="border border-gray-300 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-bold text-black dark:text-white">{children}</th>;
                 },
                 td({ children }) {
-                  return <td className="border border-gray-300 px-4 py-2">{children}</td>;
+                  return <td className="border border-gray-300 px-4 py-2 text-black dark:text-white">{children}</td>;
                 }
               }}
             >
@@ -123,7 +126,7 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
             </ReactMarkdown>
           )}
           {!isUser && isStreaming && (
-            <span className="ml-0.5 inline-block w-[2px] h-[16px] bg-gray-700 animate-pulse align-middle" />
+            <span className="ml-0.5 inline-block w-[2px] h-[16px] bg-black dark:bg-white animate-pulse align-middle" />
           )}
         </div>
 

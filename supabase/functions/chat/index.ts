@@ -63,10 +63,10 @@ serve(async (req) => {
 
     let fullResponse = "";
     const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
 
     // Handle the stream in the background
     (async () => {
+      let buffer = "";
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -74,20 +74,21 @@ serve(async (req) => {
 
           await writer.write(value);
 
-          // For logging, we need to parse the chunks
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n").filter(line => line.trim() !== "");
+          // For logging, we need to parse the chunks robustly
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
 
           for (const line of lines) {
             if (line.startsWith("data: ")) {
-              const dataStr = line.slice(6);
+              const dataStr = line.slice(6).trim();
               if (dataStr === "[DONE]") continue;
               try {
                 const data = JSON.parse(dataStr);
                 const content = data.choices[0]?.delta?.content || "";
                 fullResponse += content;
               } catch (e) {
-                console.error("Error parsing chunk", e);
+                console.error("Error parsing chunk", e, dataStr);
               }
             }
           }
