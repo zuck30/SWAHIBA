@@ -108,12 +108,20 @@ export const useChatStore = create<ChatState>()(
           timestamp: Date.now(),
         };
 
+        const aiMessageId = crypto.randomUUID();
+        const aiMessage: Message = {
+          id: aiMessageId,
+          role: "assistant",
+          content: "",
+          timestamp: Date.now(),
+        };
+
         set((state) => {
           const updatedConversations = state.conversations.map((conv) =>
             conv.id === currentConversationId
               ? {
                   ...conv,
-                  messages: [...conv.messages, userMessage],
+                  messages: [...conv.messages, userMessage, aiMessage],
                   title: conv.messages.length === 0 ? content.slice(0, 30) : conv.title,
                   updatedAt: Date.now(),
                 }
@@ -134,7 +142,7 @@ export const useChatStore = create<ChatState>()(
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              messages: get().conversations.find((c) => c.id === currentConversationId)?.messages || [],
+              messages: get().conversations.find((c) => c.id === currentConversationId)?.messages.slice(0, -1) || [], // exclude the empty ai message
               consent: get().consented || false,
               sessionId: getSessionId(),
               conversationId: currentConversationId,
@@ -143,48 +151,66 @@ export const useChatStore = create<ChatState>()(
 
           if (!response.ok) throw new Error("Failed to get response");
 
-          const data = await response.json();
+          const reader = response.body?.getReader();
+          if (!reader) throw new Error("No reader");
 
-          const aiMessage: Message = {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: data.response,
-            timestamp: Date.now(),
-          };
+          const decoder = new TextDecoder();
+          let accumulatedContent = "";
 
-          set((state) => {
-            const updatedConversations = state.conversations.map((conv) =>
-              conv.id === currentConversationId
-                ? {
-                    ...conv,
-                    messages: [...conv.messages, aiMessage],
-                    updatedAt: Date.now(),
-                  }
-                : conv
-            );
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-            const updatedCurrent = updatedConversations.find(c => c.id === currentConversationId) || null;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split("\n");
 
-            return {
-              conversations: updatedConversations,
-              currentConversation: updatedCurrent,
-              isGenerating: false,
-            };
-          });
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const dataStr = line.slice(6);
+                if (dataStr === "[DONE]") continue;
+                try {
+                  const data = JSON.parse(dataStr);
+                  const contentChunk = data.choices[0]?.delta?.content || "";
+                  accumulatedContent += contentChunk;
+
+                  // Update store with progress
+                  set((state) => {
+                    const updatedConversations = state.conversations.map((conv) =>
+                      conv.id === currentConversationId
+                        ? {
+                            ...conv,
+                            messages: conv.messages.map((msg) =>
+                              msg.id === aiMessageId ? { ...msg, content: accumulatedContent } : msg
+                            ),
+                          }
+                        : conv
+                    );
+                    const updatedCurrent = updatedConversations.find(c => c.id === currentConversationId) || null;
+                    return {
+                      conversations: updatedConversations,
+                      currentConversation: updatedCurrent,
+                    };
+                  });
+                } catch (e) {
+                  // Ignore parse errors for partial chunks
+                }
+              }
+            }
+          }
+
+          set({ isGenerating: false });
         } catch (error) {
           console.error("Error sending message:", error);
-          const errorMessage: Message = {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: "Samahani, kuna hitilafu. Tafadhali jaribu tena. (Sorry, there was an error. Please try again.)",
-            timestamp: Date.now(),
-          };
+          const errorText = "Samahani, kuna hitilafu. Tafadhali jaribu tena. (Sorry, there was an error. Please try again.)";
+
           set((state) => {
             const updatedConversations = state.conversations.map((conv) =>
               conv.id === currentConversationId
                 ? {
                     ...conv,
-                    messages: [...conv.messages, errorMessage],
+                    messages: conv.messages.map((msg) =>
+                      msg.id === aiMessageId ? { ...msg, content: errorText } : msg
+                    ),
                     updatedAt: Date.now(),
                   }
                 : conv

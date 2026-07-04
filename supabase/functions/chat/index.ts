@@ -12,6 +12,11 @@ Your tone should be helpful, culturally aware of the Tanzanian context, and info
 Avoid stiff, textbook Kiswahili unless requested.
 Use common Tanzanian expressions where appropriate (e.g., "Safi", "Poa", "Mambo", "Shwari" , "Niaje" "Nambie Boss Wangu", "Freshi tu").
 If a user asks in English, you can respond in English or KiswaEnglish. If they ask in Kiswahili, respond in Kiswahili or KiswaEnglish.
+
+CRITICAL CONSTRAINTS:
+1. NEVER use mdashes (—). Use a standard dash (-) if needed.
+2. In regular conversational text, avoid using markdown headers (###) or bold (**). Use them ONLY when providing structured data like code blocks, tables, or complex lists where they are technically necessary for clarity.
+3. For normal chat, keep it natural and avoid "robotic" formatting symbols.
 `;
 
 serve(async (req) => {
@@ -22,7 +27,7 @@ serve(async (req) => {
   try {
     const { messages, consent, sessionId, conversationId } = await req.json();
 
-    // 1. Call DeepSeek API
+    // 1. Call DeepSeek API with streaming
     const deepseekResponse = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
       headers: {
@@ -31,6 +36,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "deepseek-v4-pro",
+        stream: true,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages.map((m: any) => ({
@@ -41,25 +47,73 @@ serve(async (req) => {
       }),
     });
 
-    const deepseekData = await deepseekResponse.json();
-    const aiResponse = deepseekData.choices[0].message.content;
-
-    // 2. Logging (Fire-and-forget)
-    if (consent) {
-      logToSupabase(sessionId, conversationId, messages, aiResponse).catch((err) =>
-        console.error("Logging error:", err)
-      );
+    if (!deepseekResponse.ok) {
+      const error = await deepseekResponse.text();
+      return new Response(JSON.stringify({ error }), { status: deepseekResponse.status });
     }
 
-    return new Response(
-      JSON.stringify({ response: aiResponse }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
+    // Create a TransformStream to pass through the response and also capture it for logging
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const reader = deepseekResponse.body?.getReader();
+
+    if (!reader) {
+      throw new Error("No reader available from DeepSeek response");
+    }
+
+    let fullResponse = "";
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
+
+    // Handle the stream in the background
+    (async () => {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          await writer.write(value);
+
+          // For logging, we need to parse the chunks
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n").filter(line => line.trim() !== "");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const dataStr = line.slice(6);
+              if (dataStr === "[DONE]") continue;
+              try {
+                const data = JSON.parse(dataStr);
+                const content = data.choices[0]?.delta?.content || "";
+                fullResponse += content;
+              } catch (e) {
+                console.error("Error parsing chunk", e);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Stream error:", err);
+      } finally {
+        writer.close();
+        // 2. Logging (Fire-and-forget) after stream is done
+        if (consent && fullResponse) {
+          logToSupabase(sessionId, conversationId, messages, fullResponse).catch((err) =>
+            console.error("Logging error:", err)
+          );
+        }
       }
-    );
+    })();
+
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
+
   } catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),

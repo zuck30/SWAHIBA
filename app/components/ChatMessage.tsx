@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Message } from "../types";
 import clsx from "clsx";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface ChatMessageProps {
   message: Message;
@@ -12,35 +16,7 @@ interface ChatMessageProps {
 
 export default function ChatMessage({ message, isStreaming = false }: ChatMessageProps) {
   const isUser = message.role === "user";
-  const [displayedText, setDisplayedText] = useState("");
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!message.content) {
-      setDisplayedText("");
-      return;
-    }
-
-    if (isUser || !isStreaming) {
-      setDisplayedText(message.content);
-      return;
-    }
-
-    let index = 0;
-    const text = message.content;
-    const speed = 15;
-
-    const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayedText(text.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [message.content, isUser, isStreaming]);
 
   const handleCopy = async () => {
     try {
@@ -51,6 +27,9 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
       console.error("Failed to copy:", err);
     }
   };
+
+  // Pre-process content to replace unwanted characters
+  const processedContent = message.content.replace(/—/g, "-");
 
   if (isStreaming && !message.content) {
     return (
@@ -91,23 +70,65 @@ export default function ChatMessage({ message, isStreaming = false }: ChatMessag
       )}
 
       {/* Message content */}
-      <div className={clsx("max-w-[85%] leading-relaxed relative group", isUser ? "" : "pr-8")}>
+      <div className={clsx("max-w-[90%] leading-relaxed relative group", isUser ? "" : "pr-8")}>
         <div
           className={clsx(
-            "whitespace-pre-wrap break-words text-[15px]",
+            "text-[15px] prose dark:prose-invert max-w-none",
             isUser
               ? "px-5 py-3 bg-gray-200 text-gray-900 rounded-xl shadow-sm"
               : "py-2"
           )}
         >
-          {displayedText || message.content}
+          {isUser ? (
+            <div className="whitespace-pre-wrap break-words">{processedContent}</div>
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({ node, inline, className, children, ...props }: any) {
+                  const match = /language-(\w+)/.exec(className || "");
+                  return !inline && match ? (
+                    <SyntaxHighlighter
+                      style={oneDark}
+                      language={match[1]}
+                      PreTag="div"
+                      {...props}
+                    >
+                      {String(children).replace(/\n$/, "")}
+                    </SyntaxHighlighter>
+                  ) : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+                table({ children }) {
+                  return (
+                    <div className="overflow-x-auto my-4">
+                      <table className="min-w-full border-collapse border border-gray-300">
+                        {children}
+                      </table>
+                    </div>
+                  );
+                },
+                th({ children }) {
+                  return <th className="border border-gray-300 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-bold">{children}</th>;
+                },
+                td({ children }) {
+                  return <td className="border border-gray-300 px-4 py-2">{children}</td>;
+                }
+              }}
+            >
+              {processedContent}
+            </ReactMarkdown>
+          )}
           {!isUser && isStreaming && (
-            <span className="ml-0.5 inline-block w-[2px] h-[16px] bg-gray-700 animate-pulse" />
+            <span className="ml-0.5 inline-block w-[2px] h-[16px] bg-gray-700 animate-pulse align-middle" />
           )}
         </div>
 
         {/* Copy button */}
-        {!isUser && !isStreaming && (
+        {!isUser && !isStreaming && message.content && (
           <button
             onClick={handleCopy}
             className="absolute top-0 right-0 p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"

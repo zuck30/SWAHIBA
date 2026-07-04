@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ChatRequest, ChatResponse } from "@/app/types";
+import { ChatRequest } from "@/app/types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/chat`;
@@ -39,8 +39,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data: ChatResponse = await response.json();
-    return NextResponse.json(data);
+    // Return the stream directly to the client
+    return new NextResponse(response.body, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
