@@ -18,66 +18,57 @@ export default function Navbar({ onTrySwahiba }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
     { name: "Home", href: "#home" },
-    { name: "Research", href: "#research" },
     { name: "Mission", href: "#mission" },
     { name: "Why Swahiba", href: "#why" },
-    { name: "About Us", href: "#about" },
+    { name: "About", href: "#about" },
   ];
 
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-white/80 backdrop-blur-md border-b border-google-border py-2 shadow-sm"
-          : "bg-white py-4"
+        "fixed top-0 left-0 right-0 z-50 h-[80px] transition-all duration-300 px-8 flex items-center",
+        isScrolled 
+          ? "bg-white/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]" 
+          : "bg-transparent"
       )}
     >
-      <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
-        {/* Logo and Brand */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-8 h-8 transition-transform group-hover:scale-105">
-            <Image
-              src="/assets/rubber-duck.png"
-              alt="Swahiba"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <span className="text-xl font-medium tracking-tight text-gray-900">Swahiba</span>
+      <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/assets/rubber-duck.png"
+            alt="Swahiba Logo"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
+          <span className="text-xl font-medium text-gray-900 tracking-tight">Swahiba</span>
         </Link>
 
-        {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-[14px] font-normal text-google-gray hover:text-google-blue transition-colors"
+              className="text-base font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               {link.name}
             </a>
           ))}
         </div>
 
-        {/* Action Button */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onTrySwahiba}
-            className="bg-google-blue text-white px-6 py-2 rounded-[4px] text-sm font-medium hover:bg-[#1557b0] transition-colors shadow-sm"
-          >
-            Ongea na swahiba
-          </button>
-        </div>
+        <button
+          onClick={onTrySwahiba}
+          className="bg-gray-900 hover:bg-gray-800 text-white px-7 py-3 rounded-full text-sm font-medium transition-colors"
+        >
+          Try Swahiba
+        </button>
       </div>
     </nav>
   );
