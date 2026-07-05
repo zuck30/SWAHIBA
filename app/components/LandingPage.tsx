@@ -11,33 +11,31 @@ interface LandingPageProps {
 
 export default function LandingPage({ onStartChatting }: LandingPageProps) {
   return (
-    <div className="min-h-screen bg-[#fafafa] text-gray-900 selection:bg-gray-200">
+    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased">
       <Navbar onTrySwahiba={onStartChatting} />
 
       {/* Hero Section */}
-      <section id="home" className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full -z-10">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gray-200/50 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gray-100 rounded-full blur-[120px]" />
+      <section id="home" className="pt-32 pb-24 md:pt-48 md:pb-40 px-6 relative overflow-hidden">
+        {/* Subtle background element */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full -z-10 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-50/50 rounded-full blur-[120px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm mb-8 animate-fade-in">
+        <div className="max-w-[1000px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-google-surface border border-google-border mb-8 animate-fade-in">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-google-blue"></span>
             </span>
-            <span className="text-xs font-medium text-gray-600">Built from scratch for East Africa</span>
+            <span className="text-xs font-medium text-google-gray">Built from scratch for East Africa</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
-            Akili Unde Ya <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-400">
-              Kiswahili & KiswaEnglish
-            </span>
+          <h1 className="text-4xl md:text-6xl lg:text-[72px] font-normal tracking-tight mb-8 leading-[1.1] text-gray-900">
+            Akili Unde Ya <br className="hidden md:block" />
+            <span className="text-google-blue">Kiswahili & KiswaEnglish</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg md:text-[22px] text-google-gray max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
             Experience natural conversation that understands your culture.
             Swahiba blends Kiswahili and English just like you do in your daily life.
           </p>
@@ -45,14 +43,14 @@ export default function LandingPage({ onStartChatting }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={onStartChatting}
-              className="w-full sm:w-auto px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold text-lg hover:bg-black transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-xl shadow-gray-200"
+              className="bg-google-blue text-white px-8 py-3.5 rounded-[4px] text-base font-medium hover:bg-[#1557b0] transition-colors shadow-sm flex items-center gap-2"
             >
-              Ongea na Swahiba
-              <ArrowRightIcon className="w-5 h-5" />
+              Ongea na swahiba
+              <ArrowRightIcon className="w-4 h-4" />
             </button>
             <a
               href="#research"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border border-gray-200 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="text-google-blue hover:bg-blue-50 px-8 py-3.5 rounded-[4px] text-base font-medium transition-colors"
             >
               Read Research
             </a>
@@ -60,129 +58,135 @@ export default function LandingPage({ onStartChatting }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section id="mission" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Mission</h2>
-              <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                Most global language models struggle with the nuances of local languages and the natural code-switching
-                common in East Africa. Our mission is to build AI that truly represents local language use, culture, and context.
-              </p>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                We believe in democratizing AI by creating efficient systems that run on standard consumer hardware,
-                making advanced technology accessible to students and developers across the region.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 flex flex-col gap-4">
-                <GlobeAltIcon className="w-10 h-10 text-gray-900" />
-                <h3 className="font-bold text-lg">Localized</h3>
-                <p className="text-sm text-gray-500">Reflecting East African speech patterns.</p>
-              </div>
-              <div className="p-8 bg-gray-900 text-white rounded-3xl flex flex-col gap-4 transform translate-y-8">
-                <SparklesIcon className="w-10 h-10 text-white" />
-                <h3 className="font-bold text-lg">Authentic</h3>
-                <p className="text-sm text-gray-300">Blends Swahili and English naturally.</p>
-              </div>
-              <div className="p-8 bg-gray-100 rounded-3xl flex flex-col gap-4">
-                <CpuChipIcon className="w-10 h-10 text-gray-900" />
-                <h3 className="font-bold text-lg">Efficient</h3>
-                <p className="text-sm text-gray-500">Optimized for consumer hardware.</p>
-              </div>
-              <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 flex flex-col gap-4 transform translate-y-8">
-                <BeakerIcon className="w-10 h-10 text-gray-900" />
-                <h3 className="font-bold text-lg">Original</h3>
-                <p className="text-sm text-gray-500">Built without pre-trained weights.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Section */}
-      <section id="why" className="py-24 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-16">Why Swahiba?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-10 bg-white rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <span className="text-2xl">🇹🇿</span>
-              </div>
-              <h3 className="text-xl font-bold mb-4">Kiswaenglish Support</h3>
-              <p className="text-gray-500 leading-relaxed">
-                Finally, an AI that understands when you say "Niko kwa meeting, nitakupigia later."
-              </p>
-            </div>
-            <div className="p-10 bg-white rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <span className="text-2xl">🌱</span>
-              </div>
-              <h3 className="text-xl font-bold mb-4">From Scratch</h3>
-              <p className="text-gray-500 leading-relaxed">
-                Not a fine-tune of a global model. This was built from the ground up using custom Swahili corpora.
-              </p>
-            </div>
-            <div className="p-10 bg-white rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <span className="text-2xl">💻</span>
-              </div>
-              <h3 className="text-xl font-bold mb-4">Accessible AI</h3>
-              <p className="text-gray-500 leading-relaxed">
-                Optimized for standard hardware, proving you don't need a supercomputer to build meaningful AI.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Research Section */}
-      <section id="research" className="py-24 px-6 bg-gray-900 text-white rounded-[48px] mx-6 my-12 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-[50%] h-full bg-white/5 skew-x-12 transform translate-x-1/2" />
-        <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-8">Technical Foundation</h2>
-          <p className="text-xl text-gray-400 mb-12 leading-relaxed">
-            Our architecture follows the Transformer design introduced in the foundational paper:
-            <span className="italic block mt-4 text-white">"Attention Is All You Need"</span>
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-            <div className="p-8 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10">
-              <h4 className="font-bold text-lg mb-2">MLX Optimization</h4>
-              <p className="text-sm text-gray-400">Specifically built for Silicon macOS using MLX for extreme efficiency and performance.</p>
+      <section id="research" className="py-24 border-t border-google-border bg-google-surface">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div className="space-y-4">
+              <div className="w-12 h-12 flex items-center justify-center text-google-blue">
+                <GlobeAltIcon className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-normal text-gray-900">Kiswaenglish</h3>
+              <p className="text-google-gray leading-relaxed text-[15px]">
+                Built specifically for code-switching patterns where Kiswahili
+                and English are naturally blended in daily conversation.
+              </p>
             </div>
-            <div className="p-8 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10">
-              <h4 className="font-bold text-lg mb-2">Custom Corpora</h4>
-              <p className="text-sm text-gray-400">Trained on a mix of synthetic data and public Swahili datasets to capture local idioms.</p>
+            <div className="space-y-4">
+              <div className="w-12 h-12 flex items-center justify-center text-google-blue">
+                <CpuChipIcon className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-normal text-gray-900">Efficient Architecture</h3>
+              <p className="text-google-gray leading-relaxed text-[15px]">
+                Optimized for standard consumer hardware, following the
+                Transformer design from the ground up without pre-trained weights.
+              </p>
             </div>
-          </div>
-          <div className="mt-12">
-             <a
-              href="https://github.com/zuck30/swahili-llm-scratch"
-              target="_blank"
-              className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
-            >
-              View Model Repository on GitHub
-              <ArrowRightIcon className="w-4 h-4" />
-            </a>
+            <div className="space-y-4">
+              <div className="w-12 h-12 flex items-center justify-center text-google-blue">
+                <BeakerIcon className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-normal text-gray-900">Research Led</h3>
+              <p className="text-google-gray leading-relaxed text-[15px]">
+                Inspired by first-principles approaches to AI development,
+                designed for local context, culture, and accessibility.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-6">
+      {/* Mission Section */}
+      <section id="mission" className="py-32 px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div>
+              <span className="text-google-blue font-medium text-sm tracking-wider uppercase mb-4 block">Our Mission</span>
+              <h2 className="text-3xl md:text-5xl font-normal mb-8 leading-tight">
+                Democratizing AI for <br />
+                the East African community.
+              </h2>
+              <p className="text-google-gray text-lg leading-relaxed mb-8">
+                Unlike global models, Swahiba was developed to reflect local language use and culture.
+                Our goal is to make advanced language technology accessible to students,
+                developers, and researchers without specialized infrastructure.
+              </p>
+              <div className="flex items-center gap-6 pt-4">
+                <div className="flex flex-col">
+                  <span className="text-3xl font-normal text-gray-900">0.1</span>
+                  <span className="text-sm text-google-gray">Alpha Version</span>
+                </div>
+                <div className="w-px h-12 bg-google-border" />
+                <div className="flex flex-col">
+                  <span className="text-3xl font-normal text-gray-900">100%</span>
+                  <span className="text-sm text-google-gray">From Scratch</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative bg-google-surface rounded-[32px] border border-google-border p-8 md:p-12">
+               <div className="prose prose-blue max-w-none">
+                  <h4 className="text-xl font-medium mb-4">First Principles</h4>
+                  <p className="text-google-gray">
+                    This work is inspired by the approach, teaching, and open contributions of Andrej Karpathy and Alec Radford.
+                    The architecture follows the Transformer design introduced in "Attention Is All You Need."
+                  </p>
+                  <div className="mt-8 pt-8 border-t border-google-border flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-500">MLX Optimized</span>
+                    <span className="text-sm font-medium text-gray-500">Silicon macOS</span>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Swahiba Section */}
+      <section id="why" className="py-24 px-6 bg-google-surface border-y border-google-border">
+        <div className="max-w-[1200px] mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-normal mb-16">Why Swahiba?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="p-8 bg-white rounded-2xl border border-google-border shadow-sm">
+              <div className="text-2xl mb-4">🇹🇿</div>
+              <h3 className="text-xl font-medium mb-4">Localized Context</h3>
+              <p className="text-google-gray text-sm leading-relaxed">
+                Understand the rich linguistic context of East Africa, specifically focusing on Tanzanian speech patterns.
+              </p>
+            </div>
+            <div className="p-8 bg-white rounded-2xl border border-google-border shadow-sm">
+              <div className="text-2xl mb-4">🌱</div>
+              <h3 className="text-xl font-medium mb-4">Original Weights</h3>
+              <p className="text-google-gray text-sm leading-relaxed">
+                Developed without relying on pre-trained model weights, ensuring a truly custom baseline for Swahili.
+              </p>
+            </div>
+            <div className="p-8 bg-white rounded-2xl border border-google-border shadow-sm">
+              <div className="text-2xl mb-4">💻</div>
+              <h3 className="text-xl font-medium mb-4">Hardware Friendly</h3>
+              <p className="text-google-gray text-sm leading-relaxed">
+                Designed to run efficiently on standard consumer hardware, lowering the barrier to entry.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section id="about" className="py-32 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">Inspired by the Best</h2>
-          <p className="text-lg text-gray-600 leading-relaxed mb-12">
-            This work is inspired by the approach and teachings of Andrej Karpathy and Alec Radford,
-            whose work has shown what is possible when building language models from first principles.
+          <h2 className="text-3xl md:text-4xl font-normal mb-8">Building the Future</h2>
+          <p className="text-lg text-google-gray leading-relaxed mb-12">
+            Swahiba is a research project dedicated to bridging linguistic gaps in AI.
+            We are a community-driven initiative welcoming contributions from developers
+            and researchers across the globe.
           </p>
-          <button
-            onClick={onStartChatting}
-            className="px-12 py-5 bg-gray-900 text-white rounded-3xl font-bold text-xl hover:bg-black transition-all hover:scale-[1.05] active:scale-[0.95] shadow-2xl shadow-gray-200"
-          >
-            Start Chatting Now
-          </button>
+          <div className="flex justify-center gap-4">
+             <button
+              onClick={onStartChatting}
+              className="bg-google-blue text-white px-8 py-3.5 rounded-[4px] text-base font-medium hover:bg-[#1557b0] transition-colors shadow-sm"
+            >
+              Ongea na swahiba
+            </button>
+          </div>
         </div>
       </section>
 

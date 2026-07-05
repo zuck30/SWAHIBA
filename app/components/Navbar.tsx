@@ -19,7 +19,7 @@ export default function Navbar({ onTrySwahiba }: NavbarProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -36,34 +36,33 @@ export default function Navbar({ onTrySwahiba }: NavbarProps) {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/80 backdrop-blur-md border-b border-gray-200 py-3"
-          : "bg-transparent"
+          ? "bg-white/80 backdrop-blur-md border-b border-google-border py-2 shadow-sm"
+          : "bg-white py-4"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-white/50 backdrop-blur-sm border border-gray-200 group-hover:scale-105 transition-transform">
+      <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+        {/* Logo and Brand */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-8 h-8 transition-transform group-hover:scale-105">
             <Image
               src="/assets/rubber-duck.png"
-              alt="Swahiba Logo"
-              width={32}
-              height={32}
+              alt="Swahiba"
+              fill
               className="object-contain"
             />
           </div>
-          <span className="font-bold text-xl tracking-tight text-gray-900">Swahiba</span>
+          <span className="text-xl font-medium tracking-tight text-gray-900">Swahiba</span>
         </Link>
 
-        {/* Desktop Links */}
+        {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-[14px] font-normal text-google-gray hover:text-google-blue transition-colors"
             >
               {link.name}
             </a>
@@ -71,12 +70,14 @@ export default function Navbar({ onTrySwahiba }: NavbarProps) {
         </div>
 
         {/* Action Button */}
-        <button
-          onClick={onTrySwahiba}
-          className="bg-gray-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-all active:scale-95 shadow-sm"
-        >
-          Try Swahiba
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onTrySwahiba}
+            className="bg-google-blue text-white px-6 py-2 rounded-[4px] text-sm font-medium hover:bg-[#1557b0] transition-colors shadow-sm"
+          >
+            Ongea na swahiba
+          </button>
+        </div>
       </div>
     </nav>
   );
