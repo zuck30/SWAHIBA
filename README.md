@@ -76,6 +76,41 @@ Contributions are welcome and easy to follow:
 - **Do NOT commit large data files or model weights** → these are too big for version control
 
 
+## How Swahiba Works (Current Architecture)
+
+Swahiba is being built in two parts, what's running today vs. what's in progress.
+
+>Right now, live chat at [swahiba.vercel.app](https://swahiba.vercel.app)
+is powered by the DeepSeek API, wrapped with prompt engineering tuned for
+Tanzanian context and natural Kiswahili-English (Kiswaenglish) code-switching.
+This is a deliberate **bootstrapping strategy**
+
+- We don't yet have our own model that's ready to serve production traffic
+  reliably for now as it's not perfect yet. Rather than wait, we use DeepSeek now so users get a genuinely
+  useful assistant today.
+- Every conversation (only with explicit user consent see the consent
+  prompt in app) is logged, cleaned of personal information, and used as
+  real training data.
+- That data feeds into fine-tuning our own from-scratch Swahili/Kiswa-English
+  model, built independently (no pretrained weights) in a separate repo:
+  **[swahili-llm-scratch](https://github.com/zuck30/swahili-llm-scratch)**.
+- As our own model improves, it will progressively take over more of what
+  DeepSeek currently handles the goal is to reduce reliance on DeepSeek
+  over time, not depend on it indefinitely.
+
+- The model in `swahili-llm-scratch` is real
+custom tokenizer, custom transformer architecture, trained from scratch, not
+a wrapper around someone else's weights. It's currently a ~70M parameter
+model still being instruction fine-tuned, which is why it isn't serving
+Swahiba's live traffic yet. You can verify progress directly via the
+training loss curves and checkpoints in that repo and on Hugging Face,
+rather than taking our word for it.
+
+If you're contributing to this repo, please keep this distinction clear in
+any docs, blog posts, or announcements: Swahiba (this repo) is the product
+and data pipeline. swahili-llm-scratch is the model. They are connected but
+not the same thing, and conflating them causes confusion.
+
 # License
 
 This project is open for research, education, and non‑commercial use.
