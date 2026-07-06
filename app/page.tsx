@@ -7,9 +7,8 @@ import LandingPage from "./components/LandingPage";
 import { useChatStore } from "./store/chatStore";
 
 export default function Home() {
-  const { initializeChat } = useChatStore();
+  const { initializeChat, showChat, setShowChat } = useChatStore();
   const [isRehydrated, setIsRehydrated] = useState(false);
-  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     // If already rehydrated

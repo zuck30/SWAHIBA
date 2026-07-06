@@ -25,7 +25,7 @@ export default function Sidebar() {
   const [isInitialized, setIsInitialized] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   
-  const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation } = useChatStore();
+  const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation, setShowChat } = useChatStore();
 
   // Check if we're on mobile - runs once on mount
   useEffect(() => {
@@ -318,6 +318,7 @@ export default function Sidebar() {
 
           {/* Logout */}
           <button
+            onClick={() => setShowChat(false)}
             className={clsx(
               "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors text-gray-700",
               !isOpen && "lg:justify-center"

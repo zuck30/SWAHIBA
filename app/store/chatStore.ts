@@ -9,8 +9,10 @@ interface ChatState {
   currentConversation: Conversation | null;
   isGenerating: boolean;
   consented: boolean | null;
+  showChat: boolean;
   
   initializeChat: () => void;
+  setShowChat: (show: boolean) => void;
   setConsent: (consented: boolean) => void;
   createNewConversation: () => void;
   deleteConversation: (id: string) => void;
@@ -26,6 +28,7 @@ export const useChatStore = create<ChatState>()(
       currentConversation: null,
       isGenerating: false,
       consented: typeof window !== "undefined" ? getConsent() : null,
+      showChat: false,
 
       initializeChat: () => {
         const { conversations, currentConversationId } = get();
@@ -90,6 +93,10 @@ export const useChatStore = create<ChatState>()(
           currentConversationId: id,
           currentConversation: conversation
         });
+      },
+
+      setShowChat: (show: boolean) => {
+        set({ showChat: show });
       },
 
       setConsent: (consented: boolean) => {
@@ -237,6 +244,7 @@ export const useChatStore = create<ChatState>()(
         conversations: state.conversations,
         currentConversationId: state.currentConversationId,
         consented: state.consented,
+        showChat: state.showChat,
       }),
     }
   )
