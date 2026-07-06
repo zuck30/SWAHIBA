@@ -3,6 +3,7 @@
 import { useChatStore } from "../store/chatStore";
 import { getSessionId } from "../lib/consent";
 import Link from "next/link";
+import Sidebar from "../components/Sidebar";
 import {
   ArrowLeftIcon,
   UserIcon,
@@ -153,33 +154,38 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center gap-4">
-          <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Go back">
-            <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-xl font-bold text-gray-900">Settings</h1>
-        </div>
-      </header>
+    <div className="flex h-screen bg-white overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-white border-b border-gray-100 flex-shrink-0">
+          <div className="max-w-3xl mx-auto px-4 h-16 flex items-center gap-4">
+            <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Go back">
+              <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+            </Link>
+            <h1 className="text-xl font-bold text-gray-900">Settings</h1>
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-8 space-y-12 pb-24">
-        {sections.map((section, idx) => (
-          <section key={idx} className="space-y-4">
-            <div className="flex items-center gap-3 text-gray-900">
-              <div className="p-2 bg-gray-50 rounded-lg">
-                {section.icon}
-              </div>
-              <h2 className="text-lg font-semibold">{section.title}</h2>
-            </div>
-            <div className="pl-13">
-               {section.content}
-            </div>
-          </section>
-        ))}
-      </main>
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-4 py-8 space-y-12 pb-24">
+            {sections.map((section, idx) => (
+              <section key={idx} className="space-y-4">
+                <div className="flex items-center gap-3 text-gray-900">
+                  <div className="p-2 bg-gray-50 rounded-lg">
+                    {section.icon}
+                  </div>
+                  <h2 className="text-lg font-semibold">{section.title}</h2>
+                </div>
+                <div className="pl-13">
+                  {section.content}
+                </div>
+              </section>
+            ))}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

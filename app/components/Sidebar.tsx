@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "../store/chatStore";
 import {
   PencilSquareIcon,
@@ -24,6 +25,8 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null); 
   const [isInitialized, setIsInitialized] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
   
   const { conversations, currentConversationId, createNewConversation, deleteConversation, switchConversation, setShowChat } = useChatStore();
 
@@ -104,12 +107,20 @@ export default function Sidebar() {
   const handleNewChat = () => {
     if (!hasEmptyConversation) {
       createNewConversation();
+      setShowChat(true);
+      if (pathname !== "/") {
+        router.push("/");
+      }
       if (isMobile) setIsOpen(false);
     }
   };
 
   const handleSwitchConversation = (id: string) => {
     switchConversation(id);
+    setShowChat(true);
+    if (pathname !== "/") {
+      router.push("/");
+    }
     if (isMobile) setIsOpen(false);
   };
 
@@ -307,12 +318,13 @@ export default function Sidebar() {
           <Link
             href="/settings"
             className={clsx(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700",
+              "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+              pathname === "/settings" ? "bg-gray-100 text-gray-900 font-medium" : "hover:bg-gray-100 text-gray-700",
               !isOpen && "lg:justify-center"
             )}
             title={!isOpen ? "Settings" : "Settings"}
           >
-            <Cog6ToothIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            <Cog6ToothIcon className={clsx("w-5 h-5 flex-shrink-0", pathname === "/settings" ? "text-gray-900" : "text-gray-600")} />
             {isOpen && <span className="text-sm">Settings</span>}
           </Link>
 
